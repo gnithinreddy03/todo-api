@@ -509,3 +509,91 @@ public class StudentController {
 - **Controller Restriction**: The `studentId` from the filter ensures the student can only access their own profile.
 
 With this setup, only authenticated and verified students can access their profile information in `student-api`.
+
+
+
+
+
+####Give post man calls for authentication and student apis
+
+
+
+Here’s how to set up Postman calls for testing the `authentication-api` and `student-api` microservices:
+
+### Authentication API Calls
+
+1. **Register a New User**
+    - **Method**: `POST`
+    - **URL**: `http://localhost:8082/auth/register`
+    - **Headers**: `Content-Type: application/json`
+    - **Body (JSON)**:
+      ```json
+      {
+        "username": "student123",
+        "password": "password123"
+      }
+      ```
+    - **Description**: Registers a new user with a username and password.
+
+2. **Authenticate and Get Token**
+    - **Method**: `POST`
+    - **URL**: `http://localhost:8082/auth/login`
+    - **Headers**: `Content-Type: application/json`
+    - **Body (JSON)**:
+      ```json
+      {
+        "username": "student123",
+        "password": "password123"
+      }
+      ```
+    - **Description**: Authenticates the user and returns a token.
+    - **Response Example**:
+      ```json
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR..."
+      }
+      ```
+
+3. **Validate Token**
+    - **Method**: `GET`
+    - **URL**: `http://localhost:8082/auth/validate-token?token=eyJhbGciOiJIUzI1NiIsInR...`
+    - **Description**: Validates the token and returns the user ID if valid.
+
+### Student API Calls
+
+Use the token obtained from the `login` response in the `Authorization` header of each request to `student-api`.
+
+1. **Get Student Profile (Authenticated)**
+    - **Method**: `GET`
+    - **URL**: `http://localhost:8081/students/profile/{id}`
+    - **Headers**:
+      - `Authorization`: `Bearer eyJhbGciOiJIUzI1NiIsInR...` (replace with actual token)
+      - `Content-Type`: `application/json`
+    - **Path Parameter**: `{id}` (Replace with the authenticated student’s ID)
+    - **Description**: Retrieves the student’s profile if the token is valid and the `{id}` matches the authenticated student’s ID.
+
+2. **Create or Update Student Profile (If Required)**
+    - **Method**: `POST` or `PUT`
+    - **URL**: `http://localhost:8081/students/profile`
+    - **Headers**:
+      - `Authorization`: `Bearer eyJhbGciOiJIUzI1NiIsInR...` (replace with actual token)
+      - `Content-Type`: `application/json`
+    - **Body (JSON)**:
+      ```json
+      {
+        "id": "student123",
+        "name": "John Doe",
+        "email": "johndoe@example.com"
+      }
+      ```
+    - **Description**: Creates or updates the student profile data for the authenticated student.
+
+3. **Delete Student Profile**
+    - **Method**: `DELETE`
+    - **URL**: `http://localhost:8081/students/profile/{id}`
+    - **Headers**:
+      - `Authorization`: `Bearer eyJhbGciOiJIUzI1NiIsInR...` (replace with actual token)
+    - **Path Parameter**: `{id}` (Replace with the authenticated student’s ID)
+    - **Description**: Deletes the student profile if the token is valid and the `{id}` matches the authenticated student’s ID.
+
+With these Postman requests, you should be able to verify the `authentication-api` and `student-api` functionality and enforce access control based on authentication.
